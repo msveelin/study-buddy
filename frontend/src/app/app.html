@@ -1,0 +1,59 @@
+@if (learner.current(); as l) {
+  <div class="shell">
+    <header class="mobile-bar">
+      <a class="brand" routerLink="/dashboard"><span class="logo"><app-icon name="graduation-cap" [size]="22" /></span> Study Buddy</a>
+      <button class="small" (click)="menuOpen.set(!menuOpen())">@if (menuOpen()) { <app-icon name="x" [size]="16" /> Close } @else { <app-icon name="menu" [size]="16" /> Menu }</button>
+    </header>
+
+    <aside class="sidebar" [class.open]="menuOpen()">
+      <a class="brand" routerLink="/dashboard" (click)="closeMenu()">
+        <span class="logo"><app-icon name="graduation-cap" [size]="22" /></span>
+        <span>Study Buddy</span>
+      </a>
+
+      <nav>
+        <a routerLink="/dashboard" routerLinkActive="active" (click)="closeMenu()">
+          <span class="ico"><app-icon name="home" [size]="16" /></span> Dashboard
+        </a>
+        <a routerLink="/practice" routerLinkActive="active" (click)="closeMenu()">
+          <span class="ico"><app-icon name="layers" [size]="16" /></span>
+          <span class="txt"><span class="t">Practice</span></span>
+          @if (store.cardsDue() > 0) { <span class="pct due">{{ store.cardsDue() }} due</span> }
+        </a>
+        <div class="label">Courses</div>
+        <div data-tour="tour-courses">
+        @for (c of store.courses(); track c.slug; let i = $index) {
+          <a [routerLink]="['/course', c.slug]" routerLinkActive="active" [class]="'accent-' + c.slug" (click)="closeMenu()">
+            <span class="ico"><app-icon [name]="courseIcon(c)" [size]="16" /></span>
+            <span class="txt">
+              <span class="t">{{ c.title }}</span>
+              <span class="progress-bar"><span [style.width.%]="store.percent(c.slug)"></span></span>
+            </span>
+            <span class="pct">{{ store.percent(c.slug) }}%</span>
+          </a>
+        }
+        </div>
+        <div class="label">Need help?</div>
+        <a routerLink="/help" routerLinkActive="active" (click)="closeMenu()" data-tour="tour-help">
+          <span class="ico"><app-icon name="life-buoy" [size]="16" /></span>
+          <span class="txt"><span class="t">Help & Glossary</span></span>
+        </a>
+      </nav>
+
+      <div class="who">
+        <span class="avatar">{{ l.name.charAt(0).toUpperCase() }}</span>
+        <span class="name">{{ l.name }}</span>
+        <button class="link small" (click)="switchLearner()">Switch</button>
+      </div>
+    </aside>
+
+    <main class="content">
+      <router-outlet />
+    </main>
+    <app-tour />
+  </div>
+} @else {
+  <main class="content solo">
+    <router-outlet />
+  </main>
+}
